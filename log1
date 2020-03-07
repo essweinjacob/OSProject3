@@ -1,0 +1,17 @@
+commit 1ec8493294e195324f02a4613e8abbb97218f9dd
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Mon Mar 2 19:56:26 2020 -0600
+
+    Added fork stuff. Not sure if it works
+
+commit e5268e7526d67c7abadf1996dfc1d892cb5d659f
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Mon Mar 2 19:09:37 2020 -0600
+
+    Added signal handeling to master.c
+
+commit 1bb4e5cffc5d8a06e213f029861d38c84a2b62f0
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Mon Mar 2 18:58:53 2020 -0600
+
+    Created base files for making random ints, master.c while takes in files, and bin_adder which does nothing right now
