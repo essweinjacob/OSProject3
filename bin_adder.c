@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/shm.h>
+#include <sys/types.h>
 
 int main(int argc, char* argv[]){
 	// Generate key for key1
@@ -22,6 +23,17 @@ int main(int argc, char* argv[]){
 		perror("ERROR in bin_adder for attaching memory for key1");
 		return EXIT_FAILURE;
 	}
+	int childIndex = atoi(argv[1]);
+	
+	//printf("Number at index is: %d\n", cArr[childIndex]);
+	int numAdd = atoi(argv[2]);
 
+	// Add numbers in array
+	int i;
+	for(i = 1; i < numAdd; i++){
+		cArr[childIndex] = cArr[childIndex] + cArr[childIndex + i];
+		cArr[childIndex + i] = 0;
+	}
+		
 	return 0;
 }

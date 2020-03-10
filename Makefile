@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -g
+LDLIBS = -lm
 TARGET1 = master
 TARGET2 = bin_adder
 TARGET3	= randInts
@@ -11,11 +12,11 @@ OBJS3 = randInts.o
 all: master bin_adder randInts
 
 $(TARGET1): $(OBJS1)
-	$(CC) -o $(TARGET1) $(OBJS1)
+	$(CC) -o $(TARGET1) $(OBJS1) $(LDLIBS)
 $(TARGET2): $(OBJS2)
-	$(CC) -o $(TARGET2) $(OBJS2)
+	$(CC) -o $(TARGET2) $(OBJS2) $(LDLIBS)
 $(TARGET3): $(OBJS3)
-	$(CC) -o $(TARGET3) $(OBJS3)
+	$(CC) -o $(TARGET3) $(OBJS3) $(LDLIBS)
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 clean:
