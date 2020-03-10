@@ -34,6 +34,8 @@ int main(int argc, char* argv[]){
 		cArr[childIndex] = cArr[childIndex] + cArr[childIndex + i];
 		cArr[childIndex + i] = 0;
 	}
-		
+	
+	printf("Math = %d\n", cArr[childIndex]);	
+
 	return 0;
 }
