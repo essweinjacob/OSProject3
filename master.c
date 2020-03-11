@@ -57,6 +57,27 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 
+	// Setting up clock for process usage
+	// Create shared memeory key for time
+	key_t key2 = ftok("./master.c", 2);
+	if(key1 == -1){
+		perror("ERROR: Failed to get key 2 in master.c for clock.");
+		return EXIT_FAILURE;
+	}
+	// Get shared memory key for clock
+	int clockID = shmget(key2, sizeof(int), 0666 | IPC_CREAT);
+	if(clockID == -1){
+		perror("ERROR failed to get shared memeory id for clock in master.c");
+		return EXIT_FAILURE;
+	}
+	// Attach memeory key to clock
+	clock_t *timeC = (clock_t*)shmat(arrID,(void*)0,0);
+	if(timeC == (void*)-1){
+		perror("ERROR: failed to attach memeory for clock in master.c");
+		return EXIT_FAILURE;
+	}
+	*timeC = clock();
+	
 	// Check how many numbers are in the file
 	int numLines = 0;
 	char c;
@@ -68,16 +89,6 @@ int main(int argc, char* argv[]){
 	}
 
 	readToArray(fn, numLines, numbers);
-	//printf("count: %d\n", numLines);
-	// Read numbers into array
-	/*
-	rewind(fn);	// Rewind file
-	int i;
-	for(i = 0; i < numLines; i++){
-		fscanf(fn, "%d", &numbers[i]);
-	}
-
-	*/
 	//Testing elements in the array
 	int i;
 	int total;
@@ -149,7 +160,6 @@ int main(int argc, char* argv[]){
 			exitStatus = 0;
 		}
 	}	
-
 	// Reset stuff for computation 2
 	FILE *c2 = fopen("numFile", "r");
 	rewind(c2);
@@ -220,6 +230,8 @@ int main(int argc, char* argv[]){
 	free(listOfPIDS);
 	shmdt(numbers);
 	shmctl(arrID, IPC_RMID, NULL);
+	shmdt(timeC);
+	shmctl(clockID, IPC_RMID, NULL);
 	printf("done\n");
 	return 0;
 }
