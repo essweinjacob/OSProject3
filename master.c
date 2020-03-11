@@ -118,6 +118,7 @@ int main(int argc, char* argv[]){
 			if(pid < 0){
 				perror("Forking error");
 				return EXIT_FAILURE;
+			// Launch child
 			}else if(pid == 0){
 				char convertIndex[15];
 				char convertAdd[15];
@@ -138,13 +139,16 @@ int main(int argc, char* argv[]){
 			if(WIFEXITED(status)){
 				activeChildren--;
 				exitCount++;
+				// Check if we are at/beyond the size of the array
 				if(arrIndex >= numLines){
+					// If all children are finished and weve already added the size of the array
 					if(numAdd >= numLines && activeChildren == 0){
 						exitStatus =1;
 					}
+					// If we are done with the current iteration
 					if(activeChildren == 0){
-						arrIndex = 0;
-						numAdd = numAdd * 2;
+						arrIndex = 0;	// Reset the index
+						numAdd = numAdd * 2;		// Double the amount we will add by
 					}
 				}
 				//printf("Exit the child\n");
@@ -163,7 +167,7 @@ int main(int argc, char* argv[]){
 	free(listOfPIDS);
 	// set up for Computation 2
 	numAdd = round(numLines/log2(numLines + 1));
-	printf("num add = %d\n", numAdd);
+	// Reset all the other stuff
 	listOfPIDS = calloc(numLines, (sizeof(int)));
 	exitCount = 0;
 	childDone = 0;
@@ -228,7 +232,6 @@ int main(int argc, char* argv[]){
 	shmctl(arrID, IPC_RMID, NULL);
 	shmdt(timeC);
 	shmctl(clockID, IPC_RMID, NULL);
-	printf("done\n");
 	return 0;
 }
 

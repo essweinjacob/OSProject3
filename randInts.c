@@ -13,7 +13,10 @@ int main(){
 	//Generate random numbers
 	srand(time(0));
 	int i;
-	for(i = 0; i < 64; i++){
+	int userNum;
+	printf("Enter a number 64 or greater: ");
+	scanf("%d", &userNum);
+	for(i = 0; i < userNum; i++){
 		int num = (rand() % (256 - 0 + 1)) + 0;
 		fprintf(fn, "%d\n", num);
 	}
