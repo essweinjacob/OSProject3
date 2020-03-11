@@ -19,12 +19,12 @@ int numOfPIDS = 0;
 
 int main(int argc, char* argv[]){
 	// Set up 100 second timer
-	struct itimerval time;
-	time.it_value.tv_sec = 100;
-	time.it_value.tv_usec = 0;
-	time.it_interval = time.it_value;
+	struct itimerval time1;
+	time1.it_value.tv_sec = 100;
+	time1.it_value.tv_usec = 0;
+	time1.it_interval = time1.it_value;
 	signal(SIGALRM, god);
-	setitimer(ITIMER_REAL, &time, NULL);
+	setitimer(ITIMER_REAL, &time1, NULL);
 	
 	// Set up catching ctrl c
 	signal(SIGINT, god);
@@ -139,12 +139,13 @@ int main(int argc, char* argv[]){
 				activeChildren--;
 				exitCount++;
 				if(arrIndex >= numLines){
-					numAdd = numAdd * 2;
-					//printf("numAdd = %d\n", numAdd);
-					if(numAdd >= numLines){
-						exitStatus = 1;
+					if(numAdd >= numLines && activeChildren == 0){
+						exitStatus =1;
 					}
-					arrIndex = 0;
+					if(activeChildren == 0){
+						arrIndex = 0;
+						numAdd = numAdd * 2;
+					}
 				}
 				//printf("Exit the child\n");
 			}
@@ -153,11 +154,6 @@ int main(int argc, char* argv[]){
 		// Absolute fail safe for child processes
 		if(activeChildren > 20){
 			god(1);
-		}
-		if(activeChildren == 0){
-			exitStatus = 1;
-		}else{
-			exitStatus = 0;
 		}
 	}	
 	// Reset stuff for computation 2
