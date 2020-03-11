@@ -68,7 +68,7 @@ int main(int argc, char* argv[]){
 	}
 
 	readToArray(fn, numLines, numbers);
-	printf("count: %d\n", numLines);
+	//printf("count: %d\n", numLines);
 	// Read numbers into array
 	/*
 	rewind(fn);	// Rewind file
@@ -82,10 +82,10 @@ int main(int argc, char* argv[]){
 	int i;
 	int total;
 	for(i = 0; i < numLines;i++){
-		printf("Element %d is %d\n", i, numbers[i]);
+		//printf("Element %d is %d\n", i, numbers[i]);
 		total += numbers[i];
 	}
-	printf("Total = %d\n", total);
+	//printf("Total = %d\n", total);
 	fclose(fn);
 	// Create children until done
 	int exitCount = 0;
@@ -97,8 +97,7 @@ int main(int argc, char* argv[]){
 	pid_t pid;
 	int status;
 	listOfPIDS = calloc(numLines, (sizeof(int)));
-	
-	
+		
 	// Computation 1
 	while(exitStatus == 0){
 		if(exitCount < numLines && activeChildren < 20 && childDone < numLines && arrIndex < numLines && exitStatus == 0){
@@ -150,21 +149,78 @@ int main(int argc, char* argv[]){
 			exitStatus = 0;
 		}
 	}	
-	
+
 	// Reset stuff for computation 2
-	readToArray(fn, numLines, numbers);
+	FILE *c2 = fopen("numFile", "r");
+	rewind(c2);
+	readToArray(c2, numLines, numbers);
 	free(listOfPIDS);
 	// set up for Computation 2
-	numAdd = log2(numLines + 1);
-	listOfPIDS = calloc(numAdd, (sizeof(int)));
+	numAdd = round(numLines/log2(numLines + 1));
+	printf("num add = %d\n", numAdd);
+	listOfPIDS = calloc(numLines, (sizeof(int)));
+	exitCount = 0;
+	childDone = 0;
+	arrIndex = 0;
+	activeChildren = 0;
 	exitStatus = 0;
-	//printf("num add = %d\n", numAdd);
-	// Computation 2
+	pid = 0;
+	status = 0;
+	total = 0;
+	printf("STARTING COMPUTATION 2\n");
 
+	// Computation 2
+	while(exitStatus == 0){
+		if(exitCount < numLines && activeChildren < 20 && childDone < numLines && arrIndex < numLines && exitStatus == 0){
+			pid = fork();
+			//printf("pid: %d\n", pid);
+			// Fork error
+			if(pid < 0){
+				perror("Forking error");
+				return EXIT_FAILURE;
+			}else if(pid == 0){
+				char convertIndex[15];
+				char convertAdd[15];
+				sprintf(convertIndex, "%d", arrIndex);
+				sprintf(convertAdd, "%d", numAdd);
+				char *args[] = {"./bin_adder", convertIndex, convertAdd, NULL};
+				execvp(args[0], args);
+			}
+			listOfPIDS[numOfPIDS] = pid;
+			numOfPIDS++;
+			childDone++;
+			activeChildren++;
+			// Increment array index
+			arrIndex = arrIndex + numAdd;
+		}
+		// Check if child has ended
+		if((pid = waitpid((pid_t)-1, &status, WNOHANG)) > 0){
+			if(WIFEXITED(status)){
+				activeChildren--;
+				exitCount++;
+				if(arrIndex >= numLines){
+					if(numAdd >= numLines && activeChildren == 0){
+						exitStatus = 1;
+					}
+					if(activeChildren == 0){
+						numAdd = numAdd * 2;
+						arrIndex = 0;
+					}
+				}
+			}
+		}
+		// Absolute fail safe for child processes
+		if(activeChildren > 20){
+			god(1);
+		}
+	}
+	
+	fclose(c2);
 	// Clear up shared memory
 	free(listOfPIDS);
 	shmdt(numbers);
 	shmctl(arrID, IPC_RMID, NULL);
+	printf("done\n");
 	return 0;
 }
 
@@ -173,6 +229,7 @@ void readToArray(FILE *fn, int numLines, int *numArray){
 	int i;
 	for(i = 0; i < numLines; i++){
 		fscanf(fn, "%d", &numArray[i]);
+		//printf("%d\n", numArray[i]);
 	}
 }
 
