@@ -3,6 +3,18 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #include <time.h>
+#include <semaphore.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/sem.h>
+
+int sem;
+int checking = 0;
+
+void semLock();
+void semRelease();
+
+static struct sembuf semOp;
 
 int main(int argc, char* argv[]){
 	// Generate key for key1
@@ -43,6 +55,18 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 
+	// Semaphore Get
+	key_t semKey = ftok("./master.c", 3);
+	if(semKey == -1){
+		perror("ERROR: Failed to generate key for sem in bin adder");
+		return EXIT_FAILURE;
+	}
+	sem = semget(semKey, 1, 0666 | IPC_CREAT);
+	if(sem == -1){
+		perror("ERROR: Failed to get key for sem in bin_adder");
+		return EXIT_FAILURE;
+	}
+
 	int childIndex = atoi(argv[1]);
 	
 	//printf("Number at index is: %d\n", cArr[childIndex]);
@@ -54,8 +78,31 @@ int main(int argc, char* argv[]){
 		cArr[childIndex] = cArr[childIndex] + cArr[childIndex + i];
 		cArr[childIndex + i] = 0;
 	}
-	
-	printf("Math = %d\n", cArr[childIndex]);	
 
-	return 0;
+
+	// Write to file 
+	while(checking == 0){
+		semLock();
+		// In critical section
+		FILE *fileOut = fopen("adder_log", "a");
+		fprintf(fileOut, "PID: %d Index: %d Amount to add: %d Math = %d\n", getpid(), childIndex, numAdd, cArr[childIndex]);
+		fclose(fileOut);
+		semRelease();
+	}
+
+}
+
+void semLock(){
+	semOp.sem_num = 0;
+	semOp.sem_op = -1;
+	semOp.sem_flg = 0;
+	semop(sem, &semOp, 1);
+}
+
+void semRelease(){
+	semOp.sem_num = 0;
+	semOp.sem_op = 1;
+	semOp.sem_flg = 0;
+	semop(sem, &semOp, 1);
+	checking = 1;
 }

@@ -12,12 +12,12 @@ OBJS3 = randInts.o
 all: master bin_adder randInts
 
 $(TARGET1): $(OBJS1)
-	$(CC) -o $(TARGET1) $(OBJS1) $(LDLIBS)
+	$(CC) -o $(TARGET1) $(OBJS1) $(LDLIBS) -lpthread
 $(TARGET2): $(OBJS2)
-	$(CC) -o $(TARGET2) $(OBJS2) $(LDLIBS)
+	$(CC) -o $(TARGET2) $(OBJS2) $(LDLIBS) -lpthread
 $(TARGET3): $(OBJS3)
-	$(CC) -o $(TARGET3) $(OBJS3) $(LDLIBS)
+	$(CC) -o $(TARGET3) $(OBJS3) $(LDLIBS) -lpthread
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 clean:
-	/bin/rm -f *.o $(TARGET1) $(TARGET2) $(TARGET3) numFile
+	/bin/rm -f *.o $(TARGET1) $(TARGET2) $(TARGET3) numFile adder_log

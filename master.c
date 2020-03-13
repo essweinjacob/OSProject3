@@ -9,13 +9,19 @@
 #include <math.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <semaphore.h>
+#include <sys/sem.h>
 
 void readToArray(FILE *fn, int numLines, int *numArray);
+void semLock();
+void semRelease();
 void god(int signal);
 
 // List of PIDS if we need to clear them
 int* listOfPIDS;
 int numOfPIDS = 0;
+int sem = 0;
+static struct sembuf semOp;
 
 int main(int argc, char* argv[]){
 	// Set up 100 second timer
@@ -97,7 +103,6 @@ int main(int argc, char* argv[]){
 		total += numbers[i];
 	}
 	//printf("Total = %d\n", total);
-	fclose(fn);
 	// Create children until done
 	int exitCount = 0;
 	int childDone = 0;
@@ -108,7 +113,19 @@ int main(int argc, char* argv[]){
 	pid_t pid;
 	int status;
 	listOfPIDS = calloc(numLines, (sizeof(int)));
-		
+	// Semaphore creation
+	key_t semKey = ftok("./master.c", 3);
+	if(semKey == -1){
+		perror("ERROR: Failed to generate key for semaphore in master.c");
+		return EXIT_FAILURE;
+	}
+	sem = semget(semKey, 1, 0666 | IPC_CREAT);
+	if(sem == -1){
+		perror("ERROR: Failed to get key for semID in master.c");
+		return EXIT_FAILURE;
+	}
+	semctl(sem, 0, SETVAL, 1);
+
 	// Computation 1
 	while(exitStatus == 0){
 		if(exitCount < numLines && activeChildren < 20 && childDone < numLines && arrIndex < numLines && exitStatus == 0){
@@ -143,12 +160,13 @@ int main(int argc, char* argv[]){
 				if(arrIndex >= numLines){
 					// If all children are finished and weve already added the size of the array
 					if(numAdd >= numLines && activeChildren == 0){
-						exitStatus =1;
+						exitStatus = 1;
 					}
 					// If we are done with the current iteration
 					if(activeChildren == 0){
 						arrIndex = 0;	// Reset the index
 						numAdd = numAdd * 2;		// Double the amount we will add by
+						printf("Next loop\n");
 					}
 				}
 				//printf("Exit the child\n");
@@ -191,8 +209,14 @@ int main(int argc, char* argv[]){
 			}else if(pid == 0){
 				char convertIndex[15];
 				char convertAdd[15];
+				int tempAdd;
+				if((arrIndex + numAdd) > numLines){
+					tempAdd = numLines - arrIndex;
+				}else{
+					tempAdd = numAdd;
+				}
 				sprintf(convertIndex, "%d", arrIndex);
-				sprintf(convertAdd, "%d", numAdd);
+				sprintf(convertAdd, "%d", tempAdd);
 				char *args[] = {"./bin_adder", convertIndex, convertAdd, NULL};
 				execvp(args[0], args);
 			}
@@ -215,6 +239,7 @@ int main(int argc, char* argv[]){
 					if(activeChildren == 0){
 						numAdd = numAdd * 2;
 						arrIndex = 0;
+						printf("Next loop\n");
 					}
 				}
 			}
@@ -232,6 +257,7 @@ int main(int argc, char* argv[]){
 	shmctl(arrID, IPC_RMID, NULL);
 	shmdt(timeC);
 	shmctl(clockID, IPC_RMID, NULL);
+	shmctl(sem, IPC_RMID, NULL);
 	return 0;
 }
 
@@ -242,6 +268,20 @@ void readToArray(FILE *fn, int numLines, int *numArray){
 		fscanf(fn, "%d", &numArray[i]);
 		//printf("%d\n", numArray[i]);
 	}
+}
+
+void semLock(){
+	semOp.sem_num = 0;
+	semOp.sem_op = -1;
+	semOp.sem_flg = 0;
+	semop(sem, &semOp, 1);
+}
+
+void semRelease(){
+	semOp.sem_num = 0;
+	semOp.sem_op = 1;
+	semOp.sem_flg = 0;
+	semop(sem, &semOp, 1);
 }
 
 void god(int signal){
