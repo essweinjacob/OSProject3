@@ -1,0 +1,53 @@
+commit c4d90121a626773cdb4362eede6f912daee48b62
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Wed Mar 18 17:19:23 2020 -0500
+
+    Added stuff to README
+
+commit 1c039f4c3d17f318e5707bae14fa0cfb4b722e53
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Fri Mar 13 16:52:44 2020 -0500
+
+    Finished added semaphores, logging, etc etc
+
+commit 280016555026c8ce5d40da9a506574c6a999bf96
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Tue Mar 10 21:34:56 2020 -0500
+
+    Added user input for randInts
+
+commit 2897c3cc34a05879a717286e0b9fffc70f4a9ad9
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Tue Mar 10 21:21:11 2020 -0500
+
+    Fixed issue in first computation where it would loop an extra time after the total was found
+
+commit 26562a3f50cd882fcffa34942b775980ff019b1c
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Tue Mar 10 21:09:52 2020 -0500
+
+    Added a clock for future things. Not currently working
+
+commit 79bf3576c058c430177df25c80e137b6eeae6ed2
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Tue Mar 10 20:11:36 2020 -0500
+
+    Got second computation working, working on semaphors now
+
+commit 8ef4d1ebc7500bbe9ecdf38aca18f4f7774ecaad
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Tue Mar 10 18:35:42 2020 -0500
+
+    Have first computation working
+
+commit 6df313382313d78858d1b3fcd3b672ceefef02b3
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Tue Mar 10 17:50:29 2020 -0500
+
+    Added stuff for computation 1. Commit and push to test on home computer so i dont fork bomb
+
+commit e145f92060794b3784e22ee1aea5f328017bb1df
+Author: Jacob Esswein <essweinjacob@gmail.com>
+Date:   Sat Mar 7 11:22:53 2020 -0600
+
+    got fork working
