@@ -125,6 +125,13 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 	semctl(sem, 0, SETVAL, 1);
+	FILE *fo = fopen("adder_log", "a");
+	if(!fo){
+		perror("ERROR in master.c, cannot open adder_log");
+		return EXIT_FAILURE;
+	}
+	fprintf(fo, "Starting Computation 1\n");
+	fclose(fo);
 
 	// Computation 1
 	while(exitStatus == 0){
@@ -180,6 +187,10 @@ int main(int argc, char* argv[]){
 	}	
 	// Reset stuff for computation 2
 	FILE *c2 = fopen("numFile", "r");
+	if(!c2){
+		perror("Could not open numFile in master.c");
+		return EXIT_FAILURE;
+	}
 	rewind(c2);
 	readToArray(c2, numLines, numbers);
 	free(listOfPIDS);
@@ -187,6 +198,7 @@ int main(int argc, char* argv[]){
 	numAdd = round(numLines/log2(numLines + 1));
 	// Reset all the other stuff
 	listOfPIDS = calloc(numLines, (sizeof(int)));
+	fclose(c2);
 	exitCount = 0;
 	childDone = 0;
 	arrIndex = 0;
@@ -195,7 +207,14 @@ int main(int argc, char* argv[]){
 	pid = 0;
 	status = 0;
 	total = 0;
-	printf("STARTING COMPUTATION 2\n");
+	FILE *fo2 = fopen("adder_log", "a");
+	if(!fo2){
+		perror("Could not open adder_log in master.c");
+		return EXIT_FAILURE;
+	}
+	
+	fprintf(fo2, "STARTING COMPUTATION 2\n");
+	fclose(fo2);
 
 	// Computation 2
 	while(exitStatus == 0){
@@ -250,7 +269,6 @@ int main(int argc, char* argv[]){
 		}
 	}
 	
-	fclose(c2);
 	// Clear up shared memory
 	free(listOfPIDS);
 	shmdt(numbers);

@@ -85,6 +85,10 @@ int main(int argc, char* argv[]){
 		semLock();
 		// In critical section
 		FILE *fileOut = fopen("adder_log", "a");
+		if(!fileOut){
+			perror("ERROR in bin_adder.c Could not open adder_log");
+			return EXIT_FAILURE;
+		}
 		fprintf(fileOut, "PID: %d Index: %d Amount to add: %d Math = %d\n", getpid(), childIndex, numAdd, cArr[childIndex]);
 		fclose(fileOut);
 		semRelease();

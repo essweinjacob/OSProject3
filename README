@@ -1,0 +1,18 @@
+HOW TO RUN
+	1. Type "make" to compile code
+	2. Type "./randInts" to run the random number generator
+		You will be asked to input a number greater then 2, no error checking to see if the number is base 2, just dont be rude
+	3. Type "./master". Program will run
+	4. Check "adder_log" to verify
+
+OUTSTANDING PROBLEMS
+	None
+	sleep() statements not added because they would cause the 100 second threshold to be met at 64 miniumum
+
+PROBLEMS OVERCOME
+	Fork bombing
+	Undering standing the math behind all of this
+	Implementation of semaphores
+
+COMPARISON OF ALGORTIHMS
+	The second computation is faster due to the fewer loops and thus less additions occuring.
